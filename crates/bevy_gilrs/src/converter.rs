@@ -1,6 +1,7 @@
 use bevy_input::gamepad::{GamepadAxis, GamepadButton};
+use gilrs::ev::Code;
 
-pub fn convert_button(button: gilrs::Button) -> Option<GamepadButton> {
+pub fn convert_button(button: gilrs::Button, code: Code) -> Option<GamepadButton> {
     match button {
         gilrs::Button::South => Some(GamepadButton::South),
         gilrs::Button::East => Some(GamepadButton::East),
@@ -21,11 +22,14 @@ pub fn convert_button(button: gilrs::Button) -> Option<GamepadButton> {
         gilrs::Button::DPadDown => Some(GamepadButton::DPadDown),
         gilrs::Button::DPadLeft => Some(GamepadButton::DPadLeft),
         gilrs::Button::DPadRight => Some(GamepadButton::DPadRight),
-        gilrs::Button::Unknown => None,
+        // Code::into_u32 creates a u32 with the first 16 bits being the kind, and the last 16
+        // bits corresponding to the code of the button. we only need the last 16 bits, so
+        // we cut them off with `as`
+        gilrs::Button::Unknown => Some(GamepadButton::Other(code.into_u32() as u16)),
     }
 }
 
-pub fn convert_axis(axis: gilrs::Axis) -> Option<GamepadAxis> {
+pub fn convert_axis(axis: gilrs::Axis, code: Code) -> Option<GamepadAxis> {
     match axis {
         gilrs::Axis::LeftStickX => Some(GamepadAxis::LeftStickX),
         gilrs::Axis::LeftStickY => Some(GamepadAxis::LeftStickY),
@@ -36,6 +40,10 @@ pub fn convert_axis(axis: gilrs::Axis) -> Option<GamepadAxis> {
         // The `axis_dpad_to_button` gilrs filter should filter out all DPadX and DPadY events. If
         // it doesn't then we probably need an entry added to the following repo and an update to
         // GilRs to use the updated database: https://github.com/gabomdq/SDL_GameControllerDB
-        gilrs::Axis::Unknown | gilrs::Axis::DPadX | gilrs::Axis::DPadY => None,
+        gilrs::Axis::DPadX | gilrs::Axis::DPadY => None,
+        // Code::into_u32 creates a u32 with the first 16 bits being the kind (what kind of event),
+        // and the last 16 bits corresponding to the code of the axis. we only need the last 16
+        // bits, so we cut them off with `as`
+        gilrs::Axis::Unknown => Some(GamepadAxis::Other(code.into_u32() as u16)),
     }
 }

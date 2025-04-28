@@ -622,7 +622,7 @@ pub enum GamepadButton {
     DPadRight,
 
     /// Miscellaneous buttons, considered non-standard (i.e. Extra buttons on a flight stick that do not have a gamepad equivalent).
-    Other(u8),
+    Other(u16),
 }
 
 impl GamepadButton {
@@ -685,7 +685,7 @@ pub enum GamepadAxis {
     /// Refer to [`GamepadButton::RightTrigger2`] for the analog trigger on a gamepad controller.
     RightZ,
     /// Non-standard support for other axis types (i.e. HOTAS sliders, potentiometers, etc).
-    Other(u8),
+    Other(u16),
 }
 
 impl GamepadAxis {
